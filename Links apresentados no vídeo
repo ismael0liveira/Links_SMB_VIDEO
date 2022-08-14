@@ -1,0 +1,135 @@
+SMB PARA HACKERS
+
+
+Pontos importantes antes de começar:
+
+
+SMB é um assunto muito extenso***
+
+Vamos ter diversas referências públicas ao longo
+do(s) vídeo(s).***
+
+
+Neste canal influenciamos você a PESQUISAR.***
+
+
+
+O que é SMB? / história
+
+https://pt.wikipedia.org/wiki/Server_Message_Block
+
+
+CIFS - Common Internet File System, o que é?
+
+https://docs.microsoft.com/pt-br/windows/win32/fileio/microsoft-smb-protocol-and-cifs-protocol-overview
+
+
+PIPE NOMEADO, o que é?
+
+https://pt.wikipedia.org/wiki/Pipe_nomeado
+
+Comunicação entre processos / IPC$
+
+Processo, o que é?
+
+Simplesmente: Uma instância de um programa, um
+objeto cujo comportamento e estado são
+definidos pela classe. O programa será justamente
+a "classe", observe: Você pode abrir diversos processos
+de um mesmo programa. (abrir diversos firefox)
+
+https://docs.microsoft.com/pt-br/troubleshoot/windows-server/networking/inter-process-communication-share-null-session
+
+
+NETBIOS, o que é?
+
+https://pt.wikipedia.org/wiki/NetBIOS
+
+
+
+SAMBA, o que é?
+
+
+************
+
+Interoperabilidade simplesmente é:
+
+sistemas operacionais trabalharem em conjunto para
+trocarem informações de forma eficiente.
+
+
+************
+
+https://www.samba.org/samba/what_is_samba.html
+
+https://www.samba.org/samba/docs/SambaIntro.html
+
+
+
+
+
+
+OK, agora que compreendemos toda esta base podemos
+começar entrar mais profundo no assunto.
+
+
+
+
+Começamos com MS-17010, boletim de Segurança
+da Microsoft classificado como Crítico.
+
+
+https://docs.microsoft.com/pt-br/security-updates/securitybulletins/2017/ms17-010
+
+
+
+Conhecemos:
+
+
+The Shadow Brokers / Os Corretores das Sombras
+
+https://en.wikipedia.org/wiki/The_Shadow_Brokers
+
+
+Sandworm (grupo hacker)
+
+https://en.wikipedia.org/wiki/Sandworm_(hacker_group)
+
+
+
+ETERNALBLUE
+
+https://pt.wikipedia.org/wiki/EternalBlue
+
+ETERNALROMANCE
+
+https://www.rapid7.com/db/modules/exploit/windows/smb/ms17_010_psexec/
+
+https://www.exploit-db.com/exploits/43970
+
+CVE-2017-7494 / ETERNALRED
+
+https://www.samba.org/samba/security/CVE-2017-7494.html
+
+
+https://www.exploit-db.com/exploits/42060
+
+
+
+
+RANSOWARE WannaCry
+
+https://pt.wikipedia.org/wiki/WannaCry
+
+
+
+Petya e NotPetya
+
+
+https://pt.wikipedia.org/wiki/Petya_e_NotPetya
+
+
+
+Com toda esta base acima, conseguimos observar que
+SMB/CIFS/SAMBA é um assunto muito importante a dar
+atenção.
