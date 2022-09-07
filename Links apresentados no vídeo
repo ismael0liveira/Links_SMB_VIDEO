@@ -1,4 +1,15 @@
+****************************************************************
+
+
+			VÍDEO NÚMERO 1
+
+
+****************************************************************
+
+
+
 SMB PARA HACKERS
+
 
 
 Pontos importantes antes de começar:
@@ -133,3 +144,728 @@ https://pt.wikipedia.org/wiki/Petya_e_NotPetya
 Com toda esta base acima, conseguimos observar que
 SMB/CIFS/SAMBA é um assunto muito importante a dar
 atenção.
+
+
+
+
+
+
+****************************************************************
+
+
+
+			VÍDEO NÚMERO 2
+			
+			
+****************************************************************
+
+
+
+
+
+
+///MONTANDO O LABORATÓRIO
+
+
+SAMBA / CONFIGURAÇÃO
+
+
+//Um laboratório controlado por usuários.
+
+//A ideia: Um compartilhamento administrativo.
+Tem o diretório público, diretório para funcionário João,
+diretório para funcionária Maria.
+
+
+Para fazer isto precisamos criar os usuários João e Maria.
+
+Detalhe: Vamos ser diretos ao ponto, direto para o que
+precisamos.
+
+
+Adicionando usuário com "adduser"
+
+uso mais simples:
+
+
+adduser <nome de usuario>
+
+>>>Confirmar se foi criado: /etc/passwd
+
+Para deletar usuário:
+
+
+userdel <nome de usuario>
+
+
+
+
+
+///Criamos os diretórios para compartilhamento, vamos
+criar em /home/
+
+
+mkdir <nome do diretório>
+
+
+apagar diretório:
+
+
+rm -rf <diretório>
+
+
+
+
+
+
+//Criando o grupo de trabalho:
+
+>>>>>>Domínio X Grupo de Trabalho
+
+https://social.technet.microsoft.com/wiki/pt-br/contents/articles/32295.dominio-x-grupo-de-trabalho-qual-e-a-diferenca.aspx#:~:text=Em%20uma%20rede%2C%20os%20computadores,em%20que%20n%C3%A3o%20est%C3%A1%20centralizado.
+
+
+addgroup <nome do grupo>
+
+
+>>> Confirmar se foi criado o grupo: /etc/group
+
+Para apagar um grupo:
+
+
+groupdel <nome do grupo>
+
+
+
+
+
+Para alterar o grupo de um diretório:
+
+
+
+chgrp <grupo> <diretório>
+
+
+
+Se quiser ser recursivo:
+
+
+chgrp -Rc <grupo> <diretório>
+
+
+-R > recursivo
+-c > quais arquivos estão sendo alterados os grupos
+
+
+
+Para adicionar usuário a um grupo:
+
+adduser <usuario> <grupo>
+
+>>>Confirmar: /etc/group
+
+
+
+
+///Para adicionar um usuário no SAMBA:
+
+
+
+smbpasswd -a (adicionar) ismael <usuario>
+
+
+
+>>>Confirmar se foi adicionado o usuário no samba:
+
+pdbedit -L
+
+Sobre:
+https://www.samba.org/samba/docs/current/man-html/pdbedit.8.html
+
+
+Removendo um usuário do SAMBA:
+
+
+pdbedit -x -u <usuário>
+
+
+
+
+
+Para ligar/startar o SAMBA:
+
+
+
+/etc/init.d/smbd start
+
+
+
+/etc/ -> Diretório de configuração
+
+/init.d/ -> scripts de início/parada para
+vários serviços em seu sistema / Deamons.
+
+
+
+smbd > Deamon do SMB
+
+
+
+Parar:
+
+/etc/init.d/smbd stop
+
+
+Status:
+
+/etc/init.d/smbd status
+
+
+
+
+
+
+
+Arquivo de configuração do SAMBA:
+
+
+/etc/samba/smb.conf
+
+
+>>> É recomendado sempre gerar backup
+
+
+
+
+
+Ok, agora começamos entender como funciona configurar
+o SAMBA:
+
+
+
+Diretamente da fonte:
+
+https://www.samba.org/samba/docs/current/man-html/smb.conf.5.html
+
+
+Diversas coisas interessantes:
+
+
+https://www.samba.org/samba/docs/current/man-html/
+
+
+
+
+[global]
+	//Nome do grupo de trabalho
+	workgroup = grupo administrativo
+	//Nome netbios do servidor/máquina
+	(https://pt.wikipedia.org/wiki/NetBIOS#:~:text=%C3%89%20uma%20API%20que%20fornece,como%20um%20protocolo%20de%20rede.)
+	netbios name = Administrativo
+	//Uma string que identifica o servidor
+	(https://www.samba.org/samba/docs/current/man-html/smb.conf.5.html#SERVERSTRING)
+	server string = Servidor do setor administrativo
+
+[compartilhamento]
+///um comentário para aparecer quando passa o mouse por cima
+(https://www.samba.org/samba/docs/current/man-html/smb.conf.5.html + CTRL + F)
+comment = Pasta de compartilhamento
+path = /home/ninja/compartilhamento
+//validos para acesso
+valid users = ismael
+//poder escrever dentro da pasta
+writable = yes
+read only = yes isso vai significar que só tem permissão
+para ler, mas não escrever.
+Para permitir é só dá:
+read only = no
+
+
+Para configuração do SAMBA/incluindo segurança:
+
+https://www.samba.org/samba/docs/using_samba/ch09.html
+
+
+NOTA: Sempre que você modificar este arquivo você
+deve executar o comando "testparm" para verificar
+se você não fez nenhuma sintaxe errada.
+
+Sobre:
+
+https://www.samba.org/samba/docs/current/man-html/testparm.1.html
+
+
+
+
+Uma configuração final de exemplo:
+
+
+
+[global]
+	workgroup = teste legal
+        netbios name = Administrativo
+        server string = Servidor do setor administrativo
+
+[testeabc]
+	comment = Pasta de compartilhamento
+	path = /home/testeabc/
+	valid users = @administrativo
+	writable = yes
+	read only = no
+
+
+
+
+
+Como acessar um compartilhamento
+
+
+smbclient
+
+https://www.samba.org/samba/docs/current/man-html/smbclient.1.html
+
+
+smbclient \\\\10.0.0.104\\testeabc -U <<nome de usuário>>
+
+
+
+>>> Uma observação: Além da permissão de escrita em smb.conf, também
+deve-se alterar a permissão direto no linux/debian para que o usuário
+consiga interagir no diretório.
+
+
+
+Nesta documentação acima também encontramos uma sessão explicando as
+opções de comandos dentro da sessão aberta com o usuário.
+
+
+
+
+
+
+
+
+
+
+
+
+****************************************************************
+
+
+
+			VÍDEO NÚMERO 3
+			
+
+****************************************************************
+
+
+
+
+
+
+
+
+
+
+
+ENUMERAÇÃO SMB/CIFS/SAMBA/
+
+
+Antes de prosseguir...
+
+
+No vídeo anterior eu setei a configuração de compartilhamento dos
+diretórios errados, basta alterar de:
+
+
+[maria]
+        comment = diretorio maria
+        path = /home/maria
+        valid users = maria
+        writable = yes
+        read only = no
+
+para:
+
+
+[admmaria]
+        comment = diretorio maria
+        path = /home/admmaria
+        valid users = maria
+        writable = yes
+        read only = no
+
+
+
+o mesmo com o Joao
+
+
+
+Outro detalhe:
+
+
+Na videoaula anterior eu apaguei os
+diretórios de usuários maria e joao, criei
+novos, mas esqueci de alterar o grupo de usuário
+do diretório e também o proprietário do diretório,
+portanto:
+
+
+Para alterar o grupo de um diretório:
+
+
+chgrp (change group)
+chgrp <grupo> <diretório>
+
+
+chgrp joao joao/
+chgrp maria maria/
+
+
+
+Para alterar o proprietário:
+
+chown (change owner)
+
+chown <novo proprietário> <diretório>
+
+
+
+
+
+Agora sim podemos prosseguir para enumeração de SMB/
+CIFS/SAMBA
+
+
+
+Vamos conhecer algumas ferramentas interessantes...
+
+
+
+
+
+
+
+
+ferramentas do Samba smbclient, rpclient, net e nmblookup.
+
+
+SMBCLIENT
+
+cliente tipo ftp para acessar recursos SMB/CIFS em servidores****
+
+https://www.samba.org/samba/docs/current/man-html/smbclient.1.html
+
+
+
+
+
+
+
+
+
+RPCCLIENT
+
+ferramenta para executar funções MS-RPC do lado do cliente****
+
+https://www.samba.org/samba/docs/current/man-html/rpcclient.1.html
+
+
+MS-RPC
+
+https://en.wikipedia.org/wiki/Microsoft_RPC
+
+https://www.ibm.com/docs/pt-br/dsm?topic=SS42VS_DSM/c_dsm_guide_ms_sec_event_log_MSRPC_overview.html
+
+
+É importante ver o aviso em samba.org sobre MSRPC****
+
+
+AVISO! O código MSRPC sobre SMB foi desenvolvido a partir do exame de rastreamentos de rede.****
+
+
+Link:
+
+https://www.samba.org/samba/docs/current/man-html/rpcclient.1.html
+
+
+
+
+
+
+
+NET -> SMB/SAMBA
+
+https://www.samba.org/samba/docs/current/man-html/net.8.html
+
+
+ACTIVE DIRECTORY
+
+https://pt.wikipedia.org/wiki/Active_Directory
+
+https://docs.microsoft.com/pt-br/windows-server/identity/ad-ds/get-started/virtual-dc/active-directory-domain-services-overview
+
+
+RAP
+
+https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-rap/368e66a6-b33b-4c05-8b94-655d5fdd321c
+
+https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-rap/fb8d5bd1-e57c-4be1-b063-ec31330bdd58
+
+
+
+
+
+
+NMBLOOKUP
+
+https://www.samba.org/samba/docs/current/man-html/nmblookup.1.html
+
+
+
+
+
+
+
+
+
+
+
+
+SHOW!!! Agora que conhecemos todas essas ferramentas acima podemos
+conhecer ferramentas para nossa enumeração SMB:
+
+
+
+
+
+
+NMAP
+
+
+https://nmap.org/
+
+
+
+SERVIÇOS/PORTAS
+
+
+
+https://pt.wikipedia.org/wiki/Lista_de_portas_dos_protocolos_TCP_e_UDP
+
+
+https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
+
+
+
+SMB/SAMBA PORTS
+
+https://docs.microsoft.com/pt-br/troubleshoot/windows-server/networking/direct-hosting-of-smb-over-tcpip
+
+
+Em nosso exemplo, vamos focar em 139, 445
+
+
+nmap -p 139,445 <IP-Alvo>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ENUM4LINUX
+
+
+
+
+
+
+
+
+
+
+
+
+
+https://www.kali.org/tools/enum4linux/
+
+
+wrapper => Envelope/Embrulho => Função
+
+
+
+Podemos até dar uma verificado no help de ENUM4LINUX e
+ver as opções que ele nos dá para coletar informações.
+
+
+enum4linux -h
+
+
+
+
+Uma opção legal...
+
+
+-s arquivo de força bruta adivinhando nomes de compartilhamento
+
+
+
+Realizar um ataque de WORDLIST para descobrir compartilhamentos
+em SMB/SAMBA
+
+
+
+enum4linux -s <caminhoArquivo> <IP-ALVO>
+
+
+
+
+
+
+
+
+
+
+
+NULL SESSION / SESSÃO NULA
+
+
+Direto da Fonte: Microsoft
+
+https://techcommunity.microsoft.com/t5/storage-at-microsoft/smb-and-null-sessions-why-your-pen-test-is-probably-wrong/ba-p/1185365
+
+
+compartilhamento IPC$ / Conexão de sessão nula
+
+
+https://docs.microsoft.com/pt-br/troubleshoot/windows-server/networking/inter-process-communication-share-null-session
+
+
+
+
+
+
+
+
+Olha que interessante se rodarmos:
+
+smbclient -L '//10.0.0.104/' -U
+
+
+
+Lembramos das opções -L e -U****
+
+https://www.samba.org/samba/docs/current/man-html/smbclient.1.html
+
+
+
+
+E também:
+
+smbclient \\\\10.0.0.104\\IPC$ 
+
+
+
+
+
+
+
+
+Voltamos um pouco em  NMAP....
+
+
+
+Mecanismo de script Nmap (NSE)
+
+
+https://nmap.org/book/man-nse.html
+
+
+Localizando scripts NSE disponíveis....
+
+
+
+locate "*.nse"
+
+
+Diretório:
+
+/usr/share/nmap/scripts/
+
+
+
+
+
+
+Seguindo a documentação de NMAP, rodamos:
+
+nmap -p 445 --script vuln <IP-Alvo>
+
+
+
+
+
+Sobre VULNS
+
+https://nmap.org/nsedoc/lib/vulns.html#script-args
+
+
+
+
+
+Ok, agora também vale saber o que está acontecendo
+por trás de todo esse resultado que estamos conseguindo
+obter...
+
+
+É interessante estudar como o protocolo SMB/SAMBA funciona,
+assim compreendendo como as coisas funcionam e também o
+porque funcionam.
+
+Já digo antecipadamente: É um assunto muito grande, leva tempo...
+
+
+
+LISTA DE DOCUMENTOS TÉCNICOS MICROSOFT****
+(Aqui encontramos SMB e diversos outros)
+
+https://docs.microsoft.com/en-us/openspecs/windows_protocols/MS-WINPROTLP/e36c976a-6263-42a8-b119-7a3cc41ddd2a
+
+Sintaxe da Mensagem SMB 2
+
+https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-smb2/6eaf6e75-9c23-4eda-be99-c9223c60b181
+
+
+
+
+Capturando Pacotes SMB/SAMBA
+
+
+https://wiki.samba.org/index.php/Capture_Packets
+
+
+
+
+WIRESHARK
+
+https://www.wireshark.org/
+
+
+
+Capturando SMB/SAMBA com WIRESHARK ao usar
+enum4linux com objetivo de estudar o seu funcionamento***
+
+Claro, lembramos que enum4Linux é um conjunto de ferramentas,
+portanto também podemos analisar uma por uma.****
+
+
